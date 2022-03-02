@@ -20,7 +20,7 @@
 
 \begin{document}
 %
-\title{Decay Heat Model Derivation}
+\title{Decay Heat Model Derivation for Moltres}
 \author{}
 \date{}
 %
@@ -113,7 +113,7 @@ Y_{li} \left< \Sigma_{fl} \right> \phi (t) \\
 \Rightarrow \frac{d\omega_i (t)}{dt} &= - \lambda_i \omega_i (t) + \lambda_i
 \epsilon_i \sum_j [B_{ji}
 \lambda_j N_j (t) + \left<\Sigma_{ji}\right> \phi (t)] + \lambda_i \sum_l
-\kappa_{li} \left< \Sigma_{fl} \right> \phi (t) \\
+\kappa_{li} \left< \Sigma_{fl} \right> \phi (t) \label{eq:nuclide} \\
 \intertext{where}
 \epsilon_i &= \text{ average decay heat from the decay of nuclide }i \text{ [J]} \nonumber \\
 \kappa_{li} &= \epsilon_i Y_{li} = \text{ average decay heat per fission of nuclide $l$ from the decay of nuclide }i \text{ [J]} \nonumber \\
@@ -121,13 +121,26 @@ Y_{li} \left< \Sigma_{fl} \right> \phi (t) \\
 cm$^{-3}$]} \nonumber
 \end{align}
 
-Comparing the final equation to the Fiorina model, we observe that
-his models ignore the source terms for decay and transmutation from other
-isotopes. The same observation can be made for the PyRK model, although in
-addition to that, there is an extra $\lambda_i$ term in the remaining source
-term.
+To simplify Equation \ref{eq:nuclide}, we approximate the time evolution of
+decay heat by assigning the nuclides to
+decay heat groups according to their decay constants and
+ignore the source terms for decay and transmutation from other isotopes. We
+also homogenize $\kappa_{li}$ by decay heat group,
+regardless of the fissile nuclide source $l$.
 
-\pagebreak
+\begin{align}
+\therefore \, \frac{d\omega_n (t)}{dt} &= - \lambda_n \omega_n (t) + \lambda_n
+\kappa_{n} \left< \Sigma_{f} \right> \phi (t) \\
+\intertext{where}
+\omega_n &= \text{total decay heat power density from decay heat group $n$
+[W cm$^{-3}$] \nonumber} \\
+\lambda_n &= \text{decay constant of decay heat group $n$ [s$^{-1}$]}
+\nonumber
+\end{align}
+
+This form is identical to Fiorina's formulation below, excluding the diffusion
+and advection terms for precursor drift.
+
 %
 \section*{PyRK}
 %
@@ -140,27 +153,27 @@ $\omega_k$: Decay heat from FP group $k$
 
 $\kappa_k$: Heat per fission for decay FP group $k$
 
-\section*{Moltres (Current implementation)}
+%\section*{Moltres (Current implementation)}
+%%
+%\begin{align}
+%	&\text{Fission power density:} & Q_f &= \sum_g \epsilon_g \Sigma_{f,g} \phi_g & \\
+%	&\text{Decay heat density:} & \frac{dD_k}{dt} &= f_k Q_f - \lambda_k D_k - u \cdot\nabla D_k + \nabla \cdot D_{diff} \nabla D_k & \label{eq:4} \\
+%	&\text{Temp:} & \rho c_p \frac{dT}{dt} &= - \rho c_p (\boldsymbol{u} \cdot \nabla T) + \nabla \cdot [(k + k_t) \nabla T] + (1 - \sum_k f_k) Q_f + \sum_k \lambda_k D_k &
+%\end{align}
 %
-\begin{align}
-	&\text{Fission power density:} & Q_f &= \sum_g \epsilon_g \Sigma_{f,g} \phi_g & \\
-	&\text{Decay heat density:} & \frac{dD_k}{dt} &= f_k Q_f - \lambda_k D_k - u \cdot\nabla D_k + \nabla \cdot D_{diff} \nabla D_k & \label{eq:4} \\
-	&\text{Temp:} & \rho c_p \frac{dT}{dt} &= - \rho c_p (\boldsymbol{u} \cdot \nabla T) + \nabla \cdot [(k + k_t) \nabla T] + (1 - \sum_k f_k) Q_f + \sum_k \lambda_k D_k &
-\end{align}
+%$Q$: Total fission heat [W cm$^{-3}$]
+%
+%$D_k$: Total energy of decay heat precursor concentration in group $k$ [J cm$^{-3}$]
+%
+%$\epsilon_g$: Total energy per fission (including decay heat) by neutron from energy group $g$ [J]
+%
+%$f_k$: Fraction of decay heat to total power at steady state
+%
+%$\rho$: Density of fuel salt [kg cm$^{-3}$]
+%
+%$k_t$: Turbulent thermal conductivity [W cm$^{-1}$ K$^{-1}$]
 
-$Q$: Total fission heat [W cm$^{-3}$]
-
-$D_k$: Total energy of decay heat precursor concentration in group $k$ [J cm$^{-3}$]
-
-$\epsilon_g$: Total energy per fission (including decay heat) by neutron from energy group $g$ [J]
-
-$f_k$: Fraction of decay heat to total power at steady state
-
-$\rho$: Density of fuel salt [kg cm$^{-3}$]
-
-$k_t$: Turbulent thermal conductivity [W cm$^{-1}$ K$^{-1}$]
-
-\pagebreak
+%\pagebreak
 
 \section*{Fiorina thesis (2013)}
 %
@@ -185,8 +198,8 @@ $k_t$: Turbulent thermal conductivity [W cm$^{-1}$ K$^{-1}$]
 
 \section*{ANS-5.1-2014}
 
-The 2014 revision introduced an alternative decay heat model where decay heat
-is approximated using a sum of 23 exponentials:
+The 2014 revision introduced an alternative decay heat model in which decay
+heat after fuel discharge is approximated using a sum of 23 exponentials:
 %
 \begin{align}
 DH(t,T) = \sum^{23}_{j=1} \frac{\alpha_{ij}}{\lambda_{ij}} e^{-\lambda_{ij}
